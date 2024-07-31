@@ -44,10 +44,19 @@ D --> E
 
 **Ambiente de Desenvolvimento:**
 
+* java 17 (jdk) 
+* java 21 graalvm (jdk) para compilação nativa 
 * IntelliJ IDEA
 **Framework:**  Quarkus
+* Docker
+* Docker Compose
+* Graylog (Centralized Log Management)
+* OpenSearch (Elasticsearch)
+* Jaeger (Tracing)
+* MongoDB (Database)
+* Traefik (Reverse Proxy)
 
-**Build e Gerenciamento de Dependências:**
+* **Build e Gerenciamento de Dependências:**
 
 * Maven
 
@@ -60,6 +69,8 @@ D --> E
 * SmallRye Context Propagation
 * SmallRye Health
 * Vert.x (para programação reativa)
+* Mokito (para testes)
+* Instancio (para injeção de dependência)
 
 
 ## Docker-compose commands to start the services and create the inputs in Graylog
