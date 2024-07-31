@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.maven:maven-api-meta:4.0.0-alpha-5" type="java-imported" external-system-id="Maven">
+    <properties groupId="org.apache.maven" artifactId="maven-api-meta" version="4.0.0-alpha-5" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/maven-api-meta/4.0.0-alpha-5/maven-api-meta-4.0.0-alpha-5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/maven-api-meta/4.0.0-alpha-5/maven-api-meta-4.0.0-alpha-5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/maven-api-meta/4.0.0-alpha-5/maven-api-meta-4.0.0-alpha-5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

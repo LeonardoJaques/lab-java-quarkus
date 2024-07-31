@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.maven.resolver:maven-resolver-named-locks:1.9.18" type="java-imported" external-system-id="Maven">
+    <properties groupId="org.apache.maven.resolver" artifactId="maven-resolver-named-locks" version="1.9.18" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/resolver/maven-resolver-named-locks/1.9.18/maven-resolver-named-locks-1.9.18.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/resolver/maven-resolver-named-locks/1.9.18/maven-resolver-named-locks-1.9.18-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/resolver/maven-resolver-named-locks/1.9.18/maven-resolver-named-locks-1.9.18-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

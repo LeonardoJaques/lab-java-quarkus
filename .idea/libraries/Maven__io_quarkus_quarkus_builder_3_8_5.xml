@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: io.quarkus:quarkus-builder:3.8.5" type="java-imported" external-system-id="Maven">
+    <properties groupId="io.quarkus" artifactId="quarkus-builder" version="3.8.5" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/quarkus/quarkus-builder/3.8.5/quarkus-builder-3.8.5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/io/quarkus/quarkus-builder/3.8.5/quarkus-builder-3.8.5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/quarkus/quarkus-builder/3.8.5/quarkus-builder-3.8.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
