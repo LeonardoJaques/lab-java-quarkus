@@ -81,8 +81,13 @@ docker compose up -d graylog
 curl -H "Content-Type: application/json"
 -H "Authorization: Basic YWRtaW46YWRtaW4="
 -H "X-Requested-By: curl"
--X POST -v -d '{"title":"udp input", "configuration": {"recv_buffer_size":262144, "bind_address": "0.0.0.0", "port":12201,"decompress_size_limit":8388608},"type":"org.graylog2.inputs.gelf.udp.GELFUDPInput", "global":true}' http://logging.private.dio.localhost/api/system/inputs   
+-X POST -v -d '{"title":"udp input", "configuration": {"recv_buffer_size":262144, "bind_address": "0.0.0.0", "port":12201,"decompress_size_limit":8388608},"type":"org.graylog2.inputs.gelf.udp.GELFUDPInput", "global":true}' http://logging.private.jaques.localhost/api/system/inputs   
 docker compose up -d caching database
+
+# start all services
+up  docker compose up -d reverse-proxy jaeger mongodb opensearch graylog caching database
+down    docker compose down reverse-proxy jaeger mongodb opensearch graylog caching database
+
 ```
 
 ## Quarkus commands to create the projects
@@ -168,9 +173,35 @@ quarkus dev
 Localhost: http://localhost:8080/q/dev
 ---
 
->> Quarkus Guides
+**Quarkus Guides**
 > <br> https://quarkus.io/guides/maven-tooling#dev-mode
 > <br> https://quarkus.io/guides/dev-services
 > <br> https://quarkus.io/guides/lifecycle#the-main-method
 > <br> https://quarkus.io/guides/config#configuring-quarkus
+
+
+
+## **Domain Model**
+
+> https://martinfowler.com/eaaCatalog/domainModel.html
+> <br>https://docs.oracle.com/en/java/javase/17/language/records.html
+
+## **Testing**
+
+> <br>https://quarkus.io/guides/getting-started-testing
+> <br>https://quarkus.io/guides/continuous-testing
+> <br>https://martinfowler.com/bliki/TestDrivenDevelopment.html
+> <br>https://www.thoughtworks.com/insights/blog/test-driven-development-best-thing-has-happened-software-design
+> <br>https://www.thoughtworks.com/insights/topic/testing   
+
+##  **Service Layer**
+
+> <br>https://martinfowler.com/eaaCatalog/serviceLayer.html
+> <br>https://medium.com/@osuradiss/dependency-injection-demystified-literature-based-review-4c595c610c2d
+> <br>https://quarkus.io/guides/cdi-reference
+
+##  **Repository**
+
+> <br>https://martinfowler.com/eaaCatalog/repository.html
+> <br>https://martinfowler.com/eaaCatalog/queryObject.html
 
