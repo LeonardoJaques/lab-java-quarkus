@@ -2,6 +2,7 @@ package domain;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class CandidateService {
@@ -19,5 +20,9 @@ public class CandidateService {
 
   public List<Candidate> findAll() {
     return repository.findAll();
+  }
+
+  public Candidate findById(String id) {
+    return repository.findById(id).orElseThrow();
   }
 }

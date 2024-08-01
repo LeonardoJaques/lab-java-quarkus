@@ -55,10 +55,9 @@ D --> E
 * Jaeger (Tracing)
 * MongoDB (Database)
 * Traefik (Reverse Proxy)
+* freebuilder (geração de código automática de Builder Pattern)
 
-* **Build e Gerenciamento de Dependências:**
-
-* Maven
+**Build e Gerenciamento de Dependências:** > Maven
 
 **Extensões do Quarkus:**
 
