@@ -104,6 +104,8 @@ quarkus create app br.com.jaquesprojetos:result-app \
 --extension='resteasy-reactive, logging-gelf, opentelemetry, smallrye-context-propagation, smallrye-health' \
 --no-code
 
+quarkus add extension
+quarkus extension add 'quarkus-flyway' 'quarkus-jdbc-mariadb'
 ```
 # Application.properties
 ```
@@ -205,3 +207,11 @@ Localhost: http://localhost:8080/q/dev
 > <br>https://martinfowler.com/eaaCatalog/repository.html
 > <br>https://martinfowler.com/eaaCatalog/queryObject.html
 
+
+##  **Migration**
+> <br> https://martinfowler.com/articles/evodb.html
+> <br> https://quarkus.io/guides/flywayhttps://quarkus.io/guides/databases-dev-services
+
+##  **Data Mapper**
+> <br> https://martinfowler.com/eaaCatalog/dataMapper.html
+> <br> https://quarkus.io/guides/hibernate-ormhttps://quarkus.io/guides/datasource
