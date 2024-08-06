@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.jaquesprojetos</groupId>
   <artifactId>election-management</artifactId>
-  <version>1.0.17-SNAPSHOT</version>
+  <version>1.0.18-SNAPSHOT</version>
   <properties>
     <compiler-plugin.version>3.12.1</compiler-plugin.version>
     <maven.compiler.release>17</maven.compiler.release>
@@ -52,17 +52,7 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
-    <dependency># Correct JDBC URL format for OpenTelemetry
-quarkus.datasource.jdbc.url=jdbc:mariadb://database:3306/election-management
-quarkus.datasource.jdbc.driver=io.opentelemetry.instrumentation.jdbc.OpenTelemetryDriver
-quarkus.datasource.username=election-management-user
-quarkus.datasource.password=election-management-password
-quarkus.datasource.jdbc.telemetry=true# Correct JDBC URL format for OpenTelemetry
-quarkus.datasource.jdbc.url=jdbc:mariadb://database:3306/election-management
-quarkus.datasource.jdbc.driver=io.opentelemetry.instrumentation.jdbc.OpenTelemetryDriver
-quarkus.datasource.username=election-management-user
-quarkus.datasource.password=election-management-password
-quarkus.datasource.jdbc.telemetry=true
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-opentelemetry</artifactId>
     </dependency>
