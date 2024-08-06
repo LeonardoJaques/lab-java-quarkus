@@ -52,7 +52,17 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
-    <dependency>
+    <dependency># Correct JDBC URL format for OpenTelemetry
+quarkus.datasource.jdbc.url=jdbc:mariadb://database:3306/election-management
+quarkus.datasource.jdbc.driver=io.opentelemetry.instrumentation.jdbc.OpenTelemetryDriver
+quarkus.datasource.username=election-management-user
+quarkus.datasource.password=election-management-password
+quarkus.datasource.jdbc.telemetry=true# Correct JDBC URL format for OpenTelemetry
+quarkus.datasource.jdbc.url=jdbc:mariadb://database:3306/election-management
+quarkus.datasource.jdbc.driver=io.opentelemetry.instrumentation.jdbc.OpenTelemetryDriver
+quarkus.datasource.username=election-management-user
+quarkus.datasource.password=election-management-password
+quarkus.datasource.jdbc.telemetry=true
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-opentelemetry</artifactId>
     </dependency>
