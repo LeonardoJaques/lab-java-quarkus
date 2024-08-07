@@ -59,6 +59,7 @@
     <dependency>
       <groupId>io.opentelemetry.instrumentation</groupId>
       <artifactId>opentelemetry-jdbc</artifactId>
+      <version>2.6.0-alpha</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
