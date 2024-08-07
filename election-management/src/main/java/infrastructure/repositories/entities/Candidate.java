@@ -90,10 +90,13 @@ public class Candidate {
   }
   
   public domain.Candidate toDomain() {
-    return new domain.Candidate(id, Optional.of(photo), givenName,
-                                familyName, email, Optional.of(phone),
-                                Optional.of(jobTitle)
-    );
+    return new domain.Candidate(getId(),
+                                Optional.ofNullable(getPhoto()),
+                                getGivenName(),
+                                getFamilyName(),
+                                getEmail(),
+                                Optional.ofNullable(getPhone()),
+                                Optional.ofNullable(getJobTitle()));
   }
   
 }

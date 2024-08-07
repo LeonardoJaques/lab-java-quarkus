@@ -56,6 +56,8 @@ D --> E
 * MongoDB (Database)
 * Traefik (Reverse Proxy)
 * freebuilder (geração de código automática de Builder Pattern)
+* Jackson (para serialização e desserialização de JSON)
+* RestAssured (para testes de integração)
 
 **Build e Gerenciamento de Dependências:** > Maven
 
@@ -215,3 +217,8 @@ Localhost: http://localhost:8080/q/dev
 ##  **Data Mapper**
 > <br> https://martinfowler.com/eaaCatalog/dataMapper.html
 > <br> https://quarkus.io/guides/hibernate-ormhttps://quarkus.io/guides/datasource
+
+##  **Testes de integração**
+```sh
+# Enable JDBC telemetry
+quarkus.datasource.jdbc.telemetry=true```

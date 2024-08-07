@@ -1,6 +1,5 @@
 package api;
 
-import api.dto.out.Candidate;
 import domain.CandidateService;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -24,8 +23,7 @@ public class CandidateApi {
 		}
 		
 		public List<api.dto.out.Candidate> list() {
-				return candidateService.findAll().stream()
-						.map(api.dto.out.Candidate::fromDomain)
-						.toList();
-		};
+				return candidateService.findAll().stream().map(api.dto.out.Candidate::fromDomain).toList();
+		}
+		
 }
