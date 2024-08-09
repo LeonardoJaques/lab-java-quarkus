@@ -221,4 +221,23 @@ Localhost: http://localhost:8080/q/dev
 ##  **Testes de integração**
 ```sh
 # Enable JDBC telemetry
-quarkus.datasource.jdbc.telemetry=true```
+quarkus.datasource.jdbc.telemetry=true
+```
+
+## **Mockaroo for Seed**
+
+ > https://www.mockaroo.com/
+ > <br> Mockaroo é um gerador de dados de teste que permite criar grandes 
+ > quantidades de dados realistas em formatos como CSV, JSON, SQL e Excel.
+
+
+## **Redis**
+
+ > <br> https://quarkus.io/guides/redis
+ > <br> https://quarkus.io/guides/redis-reference
+ > <br> https://redis.io/commands/zadd
+
+## **Event Driven**
+
+ > <br> https://martinfowler.com/articles/201701-event-driven.html
+ > <br> https://redis.io/docs/manual/pubsub

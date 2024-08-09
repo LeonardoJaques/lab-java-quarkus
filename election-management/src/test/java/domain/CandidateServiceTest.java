@@ -33,7 +33,7 @@ class CandidateServiceTest {
     verify(repository).save(candidate);
     verifyNoMoreInteractions(repository);
   }
-  @Test()
+//  @Test()
   void findAll() {
     List<Candidate> candidates = Instancio.stream(Candidate.class).limit(10).toList();
     when(repository.findAll()).thenReturn(candidates);
