@@ -236,8 +236,22 @@ quarkus.datasource.jdbc.telemetry=true
  > <br> https://quarkus.io/guides/redis
  > <br> https://quarkus.io/guides/redis-reference
  > <br> https://redis.io/commands/zadd
+ > <br>https://redis.io/commands/zrange
+ > <br>https://redis.io/commands/zincrby
 
 ## **Event Driven**
 
  > <br> https://martinfowler.com/articles/201701-event-driven.html
  > <br> https://redis.io/docs/manual/pubsub
+
+## **Lifecycle**
+> <br> https://quarkus.io/guides/lifecycle
+
+## **Memoization/Caching**
+> <br> https://quarkus.io/guides/cache
+
+## **Reactive**
+> <br> https://quarkus.io/guides/getting-started-reactive
+> <br> https://quarkus.io/guides/quarkus-reactive-architecture
+> <br> https://quarkus.io/guides/mutiny-primer
+> <br> https://smallrye.io/smallrye-mutiny
