@@ -19,7 +19,7 @@ public class Subscribe {
 		
 		public Subscribe(ReactiveRedisDataSource reactiveRedisDataSource, RedisElectionRepository repository) {
 				LOGGER.info("Starting the subscription");
-				// Synchronous version
+//				// Synchronous version
 				Multi<String> sub = reactiveRedisDataSource.pubsub(String.class).subscribe("elections");
 				sub.emitOn(Infrastructure.getDefaultWorkerPool()).subscribe().with(id -> {
 						LOGGER.info("Election with id " + id + " has been published");
@@ -30,7 +30,7 @@ public class Subscribe {
 // Asynchronous version
 //				redisDataSource.pubsub(String.class).subscribe("elections", id -> {
 //						LOGGER.info("Election with id " + id + " has been published");
-//						Election election = repository.findById(id);
+//						Election = repository.findById(id);
 //						LOGGER.info("Election with id " + id + "starting");
 //				});
 		}

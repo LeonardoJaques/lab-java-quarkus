@@ -126,13 +126,13 @@ quarkus.shutdown.timeout=5S
 ```
 
 ## Blue-green deployment
-> **Blue-green deployment** é uma técnica de implantação de software que 
-> envolve 
-a criação de dois ambientes de produção idênticos, um ambiente "azul" (blue) e um ambiente "verde" (green).
+> **Blue-green deployment** é uma técnica de implantação de software que
+> envolve
+> a criação de dois ambientes de produção idênticos, um ambiente "azul" (blue) e um ambiente "verde" (green).
 <br> Enquanto uma versão do aplicativo é executada no ambiente azul, a nova versão é implantada e testada no ambiente verde. 
 <br> Quando a nova versão é considerada estável, o tráfego do usuário é direcionado do ambiente azul para o ambiente verde.
-<br> Dessa forma, o ambiente azul permanece disponível e em execução para 
-  que possa ser facilmente restaurado em caso de falhas ou alterações.
+<br> Dessa forma, o ambiente azul permanece disponível e em execução para
+> que possa ser facilmente restaurado em caso de falhas ou alterações.
 <br> Esse método é usado para reduzir o tempo de inatividade e minimizar os riscos de falhas durante a implantação de software, que a nova versão seja implantada e testada antes que o tráfego do usuário seja redirecionado para ela
 
 # Padrões de Arquitetura de Software
@@ -146,11 +146,16 @@ a criação de dois ambientes de produção idênticos, um ambiente "azul" (blue
 > centro, cercado por portas (interfaces) que fornecem entradas e saídas para 
   a aplicação, e adaptadores que conectam essas portas à infraestrutura externa, como bancos de dados e APIs de terceiros. Essa arquitetura promove a separação de preocupações e permite que a lógica de negócios seja testada independentemente da infraestrutura externa.
 
->A **arquitetura** limpa é um modelo que coloca a lógica de negócios no centro, 
-cercada por camadas que fornecem abstrações para a infraestrutura externa. A arquitetura limpa tem como objetivo isolar a lógica de negócios da infraestrutura externa e promover a testabilidade, manutenibilidade e escalabilidade do código.
+> A **arquitetura** limpa é um modelo que coloca a lógica de negócios no centro,
+> cercada por camadas que fornecem abstrações para a infraestrutura externa. A arquitetura limpa tem como objetivo
+> isolar a lógica de negócios da infraestrutura externa e promover a testabilidade, manutenibilidade e escalabilidade do
+> código.
 
->A **arquitetura cebola** é um modelo que coloca a lógica de negócios no centro, 
-cercada por camadas que fornecem abstrações para as camadas externas. A arquitetura cebola tem como objetivo garantir que as camadas mais internas sejam independentes das camadas externas, permitindo que a lógica de negócios seja testada de forma isolada. A arquitetura cebola é semelhante à arquitetura limpa, mas é mais focada na independência das camadas internas.
+> A **arquitetura cebola** é um modelo que coloca a lógica de negócios no centro,
+> cercada por camadas que fornecem abstrações para as camadas externas. A arquitetura cebola tem como objetivo garantir
+> que as camadas mais internas sejam independentes das camadas externas, permitindo que a lógica de negócios seja testada
+> de forma isolada. A arquitetura cebola é semelhante à arquitetura limpa, mas é mais focada na independência das camadas
+> internas.
 
 fonte:
 https://www.thoughtworks.com/insights/blog/architecture/demystify-software-architecture-patterns
@@ -236,8 +241,18 @@ quarkus.datasource.jdbc.telemetry=true
  > <br> https://quarkus.io/guides/redis
  > <br> https://quarkus.io/guides/redis-reference
  > <br> https://redis.io/commands/zadd
- > <br>https://redis.io/commands/zrange
- > <br>https://redis.io/commands/zincrby
+ > <br> https://redis.io/commands/zrange
+ > <br> https://redis.io/commands/zincrby
+
+**Redis comandos**
+
+```sh
+ docker ps || grep redis
+ docker exec -it <containerID> redis-cli
+ ZADD election:election-id 0 "candidate-1" 0 "candidate-2"
+ keys *
+ zrange election:election-id 0 -1 WITHSCORES 
+```
 
 ## **Event Driven**
 
@@ -255,3 +270,10 @@ quarkus.datasource.jdbc.telemetry=true
 > <br> https://quarkus.io/guides/quarkus-reactive-architecture
 > <br> https://quarkus.io/guides/mutiny-primer
 > <br> https://smallrye.io/smallrye-mutiny
+
+## **Curl**
+
+```sh
+curl localhost:8080/api/voting
+curl -X POST localhost:8080/api/voting/elections/123/candidates/candidate-2
+```

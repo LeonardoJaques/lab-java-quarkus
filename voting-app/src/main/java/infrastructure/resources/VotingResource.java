@@ -13,22 +13,23 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("api/voting")
 public class VotingResource {
-		private final ElectionApi api;
-		
-		public VotingResource(ElectionApi api) {
-				this.api = api;
-		}
-		@GET
-		public List<Election> findAll() {
-				return api.findAll();
-		}
-		
-		@POST
-		@Path("elections/{electionId}/candidate/{candidateId}")
-		@ResponseStatus(RestResponse.StatusCode.ACCEPTED)
-		@Transactional
-		public void vote(@PathParam("electionId") String electionId,
-										 @PathParam("candidateId") String candidateId) {
-				api.vote(electionId, candidateId);
-		}
+    private final ElectionApi api;
+
+    public VotingResource(ElectionApi api) {
+        this.api = api;
+    }
+
+    @GET
+    public List<Election> findAll() {
+        return api.findAll();
+    }
+
+    @POST
+    @Path("elections/{electionId}/candidates/{candidateId}")
+    @ResponseStatus(RestResponse.StatusCode.ACCEPTED)
+    @Transactional
+    public void vote(@PathParam("electionId") String electionId,
+                     @PathParam("candidateId") String candidateId) {
+        api.vote(electionId, candidateId);
+    }
 }
