@@ -252,6 +252,7 @@ quarkus.datasource.jdbc.telemetry=true
  ZADD election:election-id 0 "candidate-1" 0 "candidate-2"
  keys *
  zrange election:election-id 0 -1 WITHSCORES 
+ zincrby election:election-id 1 "candidate-1"
 ```
 
 ## **Event Driven**
@@ -271,9 +272,18 @@ quarkus.datasource.jdbc.telemetry=true
 > <br> https://quarkus.io/guides/mutiny-primer
 > <br> https://smallrye.io/smallrye-mutiny
 
-## **Curl**
+## **Curl para testes manuals**
 
 ```sh
 curl localhost:8080/api/voting
 curl -X POST localhost:8080/api/voting/elections/123/candidates/candidate-2
+curl -X POST localhost:8080/api/elections 
 ```
+
+## **Maria Db**
+
+```sh
+docker exec -it [container id] mysql -uquarkus -pquarkus quarkus
+select * from election_candidates;
+```
+
