@@ -4,7 +4,7 @@ CREATE TABLE elections (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (id));
 
-CREATE TABLE election_candidates (
+CREATE TABLE election_candidate (
   election_id VARCHAR(40) NOT NULL,
   candidate_id VARCHAR(40) NOT NULL,
   votes INTEGER DEFAULT 0,

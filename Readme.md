@@ -284,6 +284,6 @@ curl -X POST localhost:8080/api/elections
 
 ```sh
 docker exec -it [container id] mysql -uquarkus -pquarkus quarkus
-select * from election_candidates;
+select * from election_candidate;
 ```
 
