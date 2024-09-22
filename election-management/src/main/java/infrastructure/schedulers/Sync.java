@@ -1,26 +1,25 @@
 package infrastructure.schedulers;
 
-import domain.Election;
 import domain.annotations.Principal;
-import infrastructure.repositories.RedisElectionRespository;
+import infrastructure.repositories.RedisElectionRepository;
 import infrastructure.repositories.SQLElectionRepository;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import java.util.List;
 
 @ApplicationScoped
 public class Sync {
     private final SQLElectionRepository sqlRepository;
-    private final RedisElectionRespository redisRespository;
+    private final RedisElectionRepository redisRepository;
 
-    public Sync(@Principal SQLElectionRepository sqlElectionRepository, RedisElectionRespository redisElectionRespository) {
-        this.sqlRepository = sqlElectionRepository;
-        this.redisRespository = redisElectionRespository;
+    public Sync(@Principal SQLElectionRepository sqlRepository, RedisElectionRepository redisRepository) {
+        this.sqlRepository = sqlRepository;
+        this.redisRepository = redisRepository;
     }
 
-    @Scheduled(cron = "*/10 * * * * ?")
-    void sync() {
-        sqlRepository.findAll().forEach(election -> sqlRepository.sync(redisRespository.sync(election)));
+    @Scheduled(cron = "*/5 * * * * ?")
+    void syncWorker() {
+        sqlRepository.findAll().forEach(election -> sqlRepository.sync(redisRepository.sync(election)));
     }
+
 }

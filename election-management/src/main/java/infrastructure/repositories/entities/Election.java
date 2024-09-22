@@ -9,19 +9,19 @@ public class Election {
 	@Id
 	private String id;
 
-	public static Election fromDomain(domain.Election domain) {
-		var entity = new Election();
-
-		entity.setId(domain.id());
-
-		return entity;
-	}
-
 	public String getId() {
 		return id;
 	}
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public static Election fromDomain(domain.Election domain) {
+		var entity = new Election();
+
+		entity.setId(domain.id());
+
+		return entity;
 	}
 }

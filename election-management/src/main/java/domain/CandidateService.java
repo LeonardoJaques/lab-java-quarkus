@@ -1,15 +1,15 @@
 package domain;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @ApplicationScoped
 public class CandidateService {
-
-  //this injection is more recommended than the constructor injection because it is more readable and performant
   private final CandidateRepository repository;
 
+  @Inject
   public CandidateService(CandidateRepository repository) {
     this.repository = repository;
   }
@@ -23,6 +23,6 @@ public class CandidateService {
   }
 
   public Candidate findById(String id) {
-    return repository.findById(id).orElseThrow();
+    return repository.findById(id).orElseThrow(NoSuchElementException::new);
   }
 }

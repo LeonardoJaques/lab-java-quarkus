@@ -19,8 +19,7 @@ public class ElectionApi {
 		service.submit();
 	}
 
-
-	public List<Election> findAll() {
+	public List<Election> list() {
 		return service.findAll().stream().map(Election::fromDomain).toList();
 	}
 }

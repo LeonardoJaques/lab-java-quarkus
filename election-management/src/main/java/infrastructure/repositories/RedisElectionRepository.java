@@ -12,24 +12,26 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 @ApplicationScoped
-public class RedisElectionRespository implements ElectionRepository {
-
+public class RedisElectionRepository implements ElectionRepository {
+    private final PubSubCommands<String> pubsub;
     private final SortedSetCommands<String, String> commands;
-    private final PubSubCommands<String> pubSubCommands;
 
-
-    public RedisElectionRespository(RedisDataSource redisDataSource) {
-        commands = redisDataSource.sortedSet(String.class, String.class);
-        pubSubCommands = redisDataSource.pubsub(String.class);
+    public RedisElectionRepository(RedisDataSource dataSource) {
+        commands = dataSource.sortedSet(String.class, String.class);
+        pubsub = dataSource.pubsub(String.class);
     }
 
     @Override
-    public void submit(domain.Election election) {
-        Map<String, Double> rank = election.votes().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().id(), entry -> entry.getValue().doubleValue()));
+    public void submit(Election election) {
+        Map<String, Double> rank = election.votes()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().id(),
+                        entry -> entry.getValue().doubleValue()));
+
         commands.zadd("election:" + election.id(), rank);
-        pubSubCommands.publish("election", election.id());
+        pubsub.publish("elections", election.id());
     }
 
     @Override
@@ -38,7 +40,6 @@ public class RedisElectionRespository implements ElectionRepository {
     }
 
     public Election sync(Election election) {
-
         var map = commands.zrangebyscoreWithScores("election:" + election.id(),
                         ScoreRange.from(Integer.MIN_VALUE, Integer.MAX_VALUE))
                 .stream()

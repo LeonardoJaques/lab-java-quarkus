@@ -9,20 +9,19 @@ import java.util.List;
 
 @ApplicationScoped
 public class ElectionService {
-
-    private final CandidateService candidateService;
-    private final Instance<ElectionRepository> repositories;
     private final ElectionRepository repository;
+    private final Instance<ElectionRepository> repositories;
+    private final CandidateService candidateService;
 
-    public ElectionService(CandidateService candidateService, @Any Instance<ElectionRepository> repositories, @Principal ElectionRepository repository) {
-        this.candidateService = candidateService;
-        this.repositories = repositories;
+    public ElectionService(@Principal ElectionRepository repository, @Any Instance<ElectionRepository> repositories, CandidateService candidateService) {
         this.repository = repository;
+        this.repositories = repositories;
+        this.candidateService = candidateService;
     }
 
     public void submit() {
         Election election = Election.create(candidateService.findAll());
-        repositories.stream().forEach(repository -> repository.submit(election));
+        repositories.forEach(repository -> repository.submit(election));
     }
 
     public List<Election> findAll() {

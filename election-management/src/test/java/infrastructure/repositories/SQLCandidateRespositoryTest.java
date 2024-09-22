@@ -10,21 +10,21 @@ import org.junit.jupiter.api.AfterEach;
 
 @QuarkusTest
 class SQLCandidateRespositoryTest extends CandidateRepositoryTest {
-  
+
   @Inject
-  SQLCandidateRespository repository;
-  
+  CandidateRepository repository;
+
   @Inject
   EntityManager entityManager;
-  
+
   @Override
   public CandidateRepository repository() {
     return repository;
   }
-  
+
   @AfterEach
   @TestTransaction
   void tearDown() {
-        entityManager.createNativeQuery("TRUNCATE TABLE candidates").executeUpdate();
+    entityManager.createNativeQuery("TRUNCATE TABLE candidates").executeUpdate();
   }
 }

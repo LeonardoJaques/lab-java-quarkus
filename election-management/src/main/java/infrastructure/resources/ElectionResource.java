@@ -31,7 +31,7 @@ public class ElectionResource {
 
 	@GET
 	public List<Election> list() {
-		return api.findAll();
+		return api.list();
 	}
 
 
