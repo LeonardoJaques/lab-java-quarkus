@@ -1,10 +1,8 @@
 package infrastructure.livecycle;
 
-import domain.Election;
 import infrastructure.repositories.RedisElectionRepository;
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
 import io.quarkus.runtime.Startup;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
@@ -15,23 +13,19 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 // is a CDI annotation that marks the class as a bean that lives as long as the application is running
 public class Subscribe {
-		private static final Logger LOGGER = Logger.getLogger(Subscribe.class);
-		
-		public Subscribe(ReactiveRedisDataSource reactiveRedisDataSource, RedisElectionRepository repository) {
-				LOGGER.info("Starting the subscription");
-//				// Synchronous version
-            Multi<String> sub = reactiveRedisDataSource.pubsub(String.class).subscribe("electionS");
-				sub.emitOn(Infrastructure.getDefaultWorkerPool()).subscribe().with(id -> {
-						LOGGER.info("Election with id " + id + " has been published");
-						Election election = repository.findById(id);
-						LOGGER.info("Election with id " + id + " starting");
-				});
+    private static final Logger LOGGER = Logger.getLogger(Subscribe.class);
 
-// Asynchronous version
-//				redisDataSource.pubsub(String.class).subscribe("elections", id -> {
-//						LOGGER.info("Election with id " + id + " has been published");
-//						Election = repository.findById(id);
-//						LOGGER.info("Election with id " + id + "starting");
-//				});
-		}
+    public Subscribe(ReactiveRedisDataSource dataSource,
+                     RedisElectionRepository repository) {
+        LOGGER.info("Startup: Subscribe");
+
+        dataSource.pubsub(String.class)
+                .subscribe("elections")
+                .emitOn(Infrastructure.getDefaultWorkerPool())
+                .subscribe()
+                .with(id -> {
+                    LOGGER.info("Election " + id + " received from subscription");
+                    LOGGER.info("Election " + repository.findById(id) + " starting");
+                });
+    }
 }

@@ -1,7 +1,6 @@
 package infrastructure.rest;
 
-import api.dto.Election;
-
+import api.dto.in.Election;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -12,7 +11,6 @@ import java.util.List;
 @RegisterRestClient(configKey = "election-management")
 public interface ElectionManagement {
     @GET
-    @Path("api/elections")
+    @Path("/api/elections")
     Uni<List<Election>> getElections();
-
 }

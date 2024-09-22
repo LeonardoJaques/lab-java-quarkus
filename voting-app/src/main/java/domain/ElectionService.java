@@ -17,14 +17,11 @@ public class ElectionService {
     }
 
     public void vote(String electionId, String candidateId) {
-        Election election = repository.findById(electionId);
-        election.candidates()
+        repository.findById(electionId)
+                .candidates()
                 .stream()
-                .filter(candidate -> candidate.id()
-                        .equals(candidateId))
+                .filter(candidate -> candidate.id().equals(candidateId))
                 .findFirst()
-                .ifPresent(candidate -> {
-                    repository.vote(electionId, candidateId);
-                });
+                .ifPresent(candidate -> repository.vote(electionId, candidate));
     }
 }

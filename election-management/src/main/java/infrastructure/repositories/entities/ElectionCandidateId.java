@@ -7,24 +7,24 @@ import java.io.Serializable;
 
 @Embeddable
 public class ElectionCandidateId implements Serializable {
-	@Column(name = "election_id")
-	private String electionId;
-	@Column(name = "candidate_id")
-	private String candidateId;
+    @Column(name = "election_id")
+    private String electionId;
+    @Column(name = "candidate_id")
+    private String candidateId;
 
-	public String getElectionId() {
-		return electionId;
-	}
+    public String getElectionId() {
+        return electionId;
+    }
 
-	public void setElectionId(String electionId) {
-		this.electionId = electionId;
-	}
+    public void setElectionId(String electionId) {
+        this.electionId = electionId;
+    }
 
-	public String getCandidateId() {
-		return candidateId;
-	}
+    public String getCandidateId() {
+        return candidateId;
+    }
 
-	public void setCandidateId(String candidateId) {
-		this.candidateId = candidateId;
-	}
+    public void setCandidateId(String candidateId) {
+        this.candidateId = candidateId;
+    }
 }

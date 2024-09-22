@@ -1,10 +1,7 @@
 package api.dto.out;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.List;
 import java.util.Optional;
-
 public record Election(String id, List<Candidate> candidates) {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public record Candidate(String id,
@@ -15,7 +12,6 @@ public record Election(String id, List<Candidate> candidates) {
                             Optional<String> jobTitle,
                             Integer votes) {
     }
-
     public static Election fromDomain(domain.Election election) {
         var candidates = election.votes()
                 .entrySet()
@@ -28,7 +24,6 @@ public record Election(String id, List<Candidate> candidates) {
                         entry.getKey().jobTitle(),
                         entry.getValue()))
                 .toList();
-
         return new Election(election.id(), candidates);
     }
 }
