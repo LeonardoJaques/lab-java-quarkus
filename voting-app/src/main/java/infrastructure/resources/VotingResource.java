@@ -29,7 +29,13 @@ public class VotingResource {
     @ResponseStatus(RestResponse.StatusCode.ACCEPTED)
     @Transactional
     public void vote(@PathParam("electionId") String electionId,
-                     @PathParam("candidateId") String candidateId) {
+            @PathParam("candidateId") String candidateId) {
+        if (electionId == null || electionId.isBlank()) {
+            throw new BadRequestException("Election ID cannot be blank");
+        }
+        if (candidateId == null || candidateId.isBlank()) {
+            throw new BadRequestException("Candidate ID cannot be blank");
+        }
         api.vote(electionId, candidateId);
     }
 }

@@ -9,7 +9,7 @@ public class ElectionCandidate {
     private ElectionCandidateId id;
     private Integer votes;
 
-    public static Object fromDomain(domain.Election election, domain.Candidate candidate, Integer votes) {
+    public static ElectionCandidate fromDomain(domain.Election election, domain.Candidate candidate, Integer votes) {
         var entity = new ElectionCandidate();
         ElectionCandidateId id = new ElectionCandidateId();
         id.setElectionId(election.id());

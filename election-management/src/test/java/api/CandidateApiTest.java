@@ -6,9 +6,9 @@ import infrastructure.repositories.SQLElectionRepository;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.persistence.EntityManager;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
-
-import javax.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
 
 @QuarkusTest
 class SQLCandidateRepositoryTest extends CandidateRepositoryTest {
@@ -21,6 +21,12 @@ class SQLCandidateRepositoryTest extends CandidateRepositoryTest {
 	@Override
 	public CandidateRepository repository() {
 		return repository;
+	}
+
+	@BeforeEach
+	@TestTransaction
+	void setUp() {
+		entityManager.createNativeQuery("TRUNCATE TABLE candidates").executeUpdate();
 	}
 
 	@AfterEach

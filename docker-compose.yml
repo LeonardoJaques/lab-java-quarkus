@@ -70,6 +70,8 @@ services:
   ## https://mariadb.org/
   database:
     image: mariadb:10.11.2
+    ports:
+      - "3306:3306"
     environment:
       - MARIADB_USER=election-management-user
       - MARIADB_PASSWORD=election-management-password
@@ -81,6 +83,8 @@ services:
   ## https://redis.io/
   caching:
     image: redis:7.0.9
+    ports:
+      - "6379:6379"
 
   # LOGGING - https://quarkus.io/guides/centralized-log-management
 

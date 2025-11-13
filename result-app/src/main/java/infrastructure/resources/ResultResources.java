@@ -11,12 +11,15 @@ import org.jboss.resteasy.reactive.RestStreamElementType;
 
 import java.time.Duration;
 import java.util.List;
+
 @Path("/")
 public class ResultResources {
     private final ElectionManagement electionManagement;
+
     public ResultResources(@RestClient ElectionManagement electionManagement) {
         this.electionManagement = electionManagement;
     }
+
     @GET
     @RestStreamElementType(MediaType.APPLICATION_JSON)
     public Multi<List<Election>> results() {
@@ -24,6 +27,6 @@ public class ResultResources {
                 .ticks()
                 .every(Duration.ofSeconds(10))
                 .onItem()
-                .transformToMultiAndMerge(n -> (java.util.concurrent.Flow.Publisher<? extends List<Election>>) electionManagement.getElections().toMulti());
+                .transformToMultiAndMerge(n -> electionManagement.getElections().toMulti());
     }
 }
