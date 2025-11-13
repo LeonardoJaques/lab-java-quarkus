@@ -4,6 +4,9 @@
 *.iml
 *.ipr
 
+# VS Code
+.vscode/
+
 # Java
 *.class
 *.jar
