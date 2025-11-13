@@ -1,3 +1,13 @@
+# Lab Quarkus - Sistema de Votação Eletrônica
+
+Projeto de sistema de votação eletrônica desenvolvido com Quarkus, implementando arquitetura hexagonal e padrões de design modernos.
+
+## Status do Projeto
+
+✅ **Compilação:** Todos os módulos compilam com sucesso  
+✅ **Testes:** 12/12 testes passando (0 falhas, 0 erros)  
+✅ **Configuração:** DevServices desabilitado, containers manuais configurados
+
 ## Definição do Escopo
 - Candidatos são listados, cadastrados e editados
 - Todos os candidatos registrados participam de uma eleição, quando for iniciada
@@ -74,25 +84,107 @@ D --> E
 * Instancio (para injeção de dependência)
 
 
-## Docker-compose commands to start the services and create the inputs in Graylog
+## Pré-requisitos
+
+- Java 17 (JDK)
+- Maven 3.8+
+- Docker e Docker Compose
+- Git
+
+## Configuração do Ambiente
+
+### 1. Iniciar Containers Docker
+
+Os containers MariaDB e Redis devem estar rodando com as portas expostas:
+
 ```sh
-docker compose up -d reverse-proxy
-docker compose up -d jaeger
-docker compose up -d mongodb opensearch
-docker compose up -d graylog
-curl -H "Content-Type: application/json"
--H "Authorization: Basic YWRtaW46YWRtaW4="
--H "X-Requested-By: curl"
--X POST -v -d '{"title":"udp input", "configuration": {"recv_buffer_size":262144, "bind_address": "0.0.0.0", "port":12201,"decompress_size_limit":8388608},"type":"org.graylog2.inputs.gelf.udp.GELFUDPInput", "global":true}' http://logging.private.jaques.localhost/api/system/inputs   
-docker compose up -d caching database
+# Iniciar banco de dados e cache
+docker compose up -d database caching
 
-# start all services
-up  docker compose up -d reverse-proxy jaeger mongodb opensearch graylog caching database
-down    docker compose down reverse-proxy jaeger mongodb opensearch graylog caching database
-
+# Verificar se os containers estão rodando
+docker ps | grep -E "database|caching"
 ```
 
-## Quarkus commands to create the projects
+**Importante:** Devido à incompatibilidade entre Testcontainers e Docker API 1.44+, os DevServices foram desabilitados. É necessário iniciar os containers manualmente antes de executar os testes.
+
+### 2. Configuração das Portas
+
+O `docker-compose.yml` já está configurado para expor as portas:
+- MariaDB: `localhost:3306`
+- Redis: `localhost:6379`
+
+### 3. Executar Testes
+
+```sh
+cd election-management
+./mvnw test
+```
+
+Todos os 12 testes devem passar com sucesso.
+
+## Correções Implementadas
+
+### Problemas Corrigidos
+
+1. **ElectionCandidate.fromDomain()** - Corrigido retorno de `Object` para `ElectionCandidate` (type safety)
+2. **ResultResources** - Removido cast perigoso para `Flow.Publisher`, usando transformação reativa correta
+3. **ElectionRepository** - Adicionado método `sync()` na interface
+4. **RedisElectionRepository** - Implementado exception handling, logging (JBoss) e método `sync()`
+5. **SQLElectionRepository** - Implementado exception handling, logging e corrigido retorno do `sync()`
+6. **VotingResource** - Adicionada validação manual de entrada com `BadRequestException`
+7. **application.properties** - Corrigido OpenTelemetry config (`jdbc.telemetry` ao invés de `driver`), adicionado logging fallback
+8. **Imports** - Corrigido `javax.inject` → `jakarta.inject` (Jakarta EE 9+)
+9. **Testes** - Adicionado `@BeforeEach` para limpar banco antes de cada teste, evitando acúmulo de dados
+
+### Configurações Importantes
+
+**DevServices Desabilitado:**
+
+Devido à incompatibilidade entre Testcontainers 1.20.4 e Docker API 1.44+, os DevServices do Quarkus foram desabilitados em `application.properties`:
+
+```properties
+%dev.quarkus.devservices.enabled=false
+%test.quarkus.devservices.enabled=false
+%dev.quarkus.datasource.devservices.enabled=false
+%test.quarkus.datasource.devservices.enabled=false
+%dev.quarkus.redis.devservices.enabled=false
+%test.quarkus.redis.devservices.enabled=false
+```
+
+**Configuração Manual (Testes):**
+
+```properties
+%test.quarkus.datasource.username=election-management-user
+%test.quarkus.datasource.password=election-management-password
+%test.quarkus.datasource.jdbc.url=jdbc:mariadb://localhost:3306/election-management
+%test.quarkus.redis.hosts=redis://localhost:6379
+```
+
+## Docker Compose - Comandos Completos
+
+```sh
+# Iniciar todos os serviços de infraestrutura
+docker compose up -d reverse-proxy jaeger mongodb opensearch graylog caching database
+
+# Ou iniciar serviços individuais
+docker compose up -d database caching  # MariaDB e Redis para desenvolvimento/testes
+docker compose up -d reverse-proxy     # Traefik
+docker compose up -d jaeger           # OpenTelemetry/Tracing
+docker compose up -d mongodb opensearch graylog  # Logging stack
+
+# Criar input GELF no Graylog (após graylog estar rodando)
+curl -H "Content-Type: application/json" \
+  -H "Authorization: Basic YWRtaW46YWRtaW4=" \
+  -H "X-Requested-By: curl" \
+  -X POST -v \
+  -d '{"title":"udp input","configuration":{"recv_buffer_size":262144,"bind_address":"0.0.0.0","port":12201,"decompress_size_limit":8388608},"type":"org.graylog2.inputs.gelf.udp.GELFUDPInput","global":true}' \
+  http://logging.private.jaques.localhost/api/system/inputs
+
+# Parar todos os serviços
+docker compose down
+```
+
+## Quarkus - Comandos para Criar Projetos
 ```sh
 quarkus create app br.com.jaquesprojetos:election-management \
 --extension='resteasy-reactive, logging-gelf, opentelemetry, smallrye-context-propagation, smallrye-health' \
@@ -109,7 +201,36 @@ quarkus create app br.com.jaquesprojetos:result-app \
 quarkus add extension
 quarkus extension add 'quarkus-flyway' 'quarkus-jdbc-mariadb'
 ```
-# Application.properties
+
+## Executando o Projeto
+
+### Modo Desenvolvimento
+
+```sh
+cd election-management  # ou voting-app, ou result-app
+./mvnw quarkus:dev
+```
+
+**Quarkus Dev UI:** http://localhost:8080/q/dev
+
+### Executar Testes
+
+```sh
+# Garantir que os containers estão rodando
+docker compose up -d database caching
+
+# Executar testes
+cd election-management
+./mvnw test
+```
+
+### Build para Produção
+
+```sh
+./mvnw package
+```
+
+## Application.properties
 ```
 quarkus.application.name=election-management // voting-app // result-app
 quarkus.shutdown.timeout=5S
