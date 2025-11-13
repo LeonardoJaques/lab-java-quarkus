@@ -113,7 +113,35 @@ O `docker-compose.yml` já está configurado para expor as portas:
 - MariaDB: `localhost:3306`
 - Redis: `localhost:6379`
 
-### 3. Executar Testes
+### 3. Variáveis de Ambiente (Opcional)
+
+O projeto utiliza as seguintes variáveis no `application.properties`:
+
+```properties
+# Database
+quarkus.datasource.jdbc.url=jdbc:mariadb://localhost:3306/election-management-database
+quarkus.datasource.username=election-management-user
+quarkus.datasource.password=election-management-password
+
+# Redis
+quarkus.redis.hosts=redis://localhost:6379
+
+# OpenTelemetry
+quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317
+```
+
+Para sobrescrever em diferentes ambientes:
+
+```sh
+# Development
+export QUARKUS_DATASOURCE_JDBC_URL=jdbc:mariadb://localhost:3306/election-management-database
+
+# Production
+export QUARKUS_DATASOURCE_JDBC_URL=jdbc:mariadb://prod-db:3306/election-db
+export QUARKUS_REDIS_HOSTS=redis://prod-redis:6379
+```
+
+### 4. Executar Testes
 
 ```sh
 cd election-management
@@ -121,6 +149,100 @@ cd election-management
 ```
 
 Todos os 12 testes devem passar com sucesso.
+
+## Estrutura do Projeto
+
+O projeto está dividido em 3 microserviços:
+
+### 1. Election Management (`election-management`)
+
+Gerenciamento de candidatos e eleições.
+
+**Endpoints:**
+
+- `POST /api/candidates` - Criar novo candidato
+- `PUT /api/candidates/{id}` - Atualizar candidato
+- `GET /api/candidates` - Listar todos os candidatos
+- `POST /api/elections` - Criar nova eleição
+- `GET /api/elections` - Listar eleições
+
+**Banco de Dados:** MariaDB (porta 3306)
+
+### 2. Voting App (`voting-app`)
+
+Aplicação para votação em tempo real.
+
+**Endpoints:**
+
+- `GET /api/voting` - Listar eleições disponíveis
+- `POST /api/voting/elections/{electionId}/candidates/{candidateId}` - Registrar voto
+
+**Cache:** Redis (porta 6379)
+
+### 3. Result App (`result-app`)
+
+Exibição de resultados em tempo real via streaming.
+
+**Endpoints:**
+
+- `GET /` - Stream de resultados (atualização a cada 10 segundos)
+
+**Tecnologia:** Server-Sent Events (SSE) com Mutiny
+
+### Fluxo de Dados
+
+```
+1. Criação de Candidatos e Eleições
+   Client → POST /api/candidates → Election Management → MariaDB
+
+2. Votação
+   Client → POST /api/voting/elections/{id}/candidates/{id} → Voting App → Redis (cache)
+   
+3. Resultados em Tempo Real
+   Result App → Redis PubSub → Server-Sent Events → Client (atualização a cada 10s)
+```
+
+### Persistência e Cache
+
+- **MariaDB:** Armazena candidatos e eleições (source of truth)
+- **Redis:** Cache de votação e sincronização em tempo real
+  - Estrutura de dados: Sorted Set (`ZADD`, `ZINCRBY`, `ZRANGE`)
+  - Pub/Sub para notificações de novos votos
+
+## API - Exemplos de Uso
+
+### Criar Candidato
+
+```sh
+curl -X POST http://localhost:8080/api/candidates \
+  -H "Content-Type: application/json" \
+  -d '{
+    "givenName": "João",
+    "familyName": "Silva",
+    "email": "joao.silva@example.com",
+    "phone": "+55 11 98765-4321",
+    "jobTitle": "Desenvolvedor Full Stack",
+    "photo": "https://example.com/photo.jpg"
+  }'
+```
+
+### Criar Eleição
+
+```sh
+curl -X POST http://localhost:8080/api/elections
+```
+
+### Votar
+
+```sh
+curl -X POST http://localhost:8080/api/voting/elections/{election-id}/candidates/{candidate-id}
+```
+
+### Ver Resultados (Stream)
+
+```sh
+curl http://localhost:8080/
+```
 
 ## Docker Compose - Comandos Completos
 
@@ -370,3 +492,91 @@ docker exec -it [container id] mysql -uquarkus -pquarkus quarkus
 select * from election_candidate;
 ```
 
+## Troubleshooting
+
+### Erro: "Connection refused" ao executar testes
+
+**Causa:** Containers Docker não estão rodando ou portas não estão expostas.
+
+**Solução:**
+
+```sh
+# Verificar containers ativos
+docker ps
+
+# Se não houver containers, iniciar database e caching
+docker compose up -d database caching
+
+# Verificar se as portas estão acessíveis
+nc -zv localhost 3306  # MariaDB
+nc -zv localhost 6379  # Redis
+```
+
+### Erro: "Port 3306 already in use"
+
+**Causa:** Outra instância do MySQL/MariaDB está usando a porta.
+
+**Solução:**
+
+```sh
+# Opção 1: Parar o serviço local
+sudo systemctl stop mysql
+sudo systemctl stop mariadb
+
+# Opção 2: Alterar porta no docker-compose.yml
+# Em services.database.ports, trocar "3306:3306" por "3307:3306"
+# E em application.properties, usar localhost:3307
+```
+
+### Testes falhando: "Table doesn't exist"
+
+**Causa:** Flyway migrations não foram executadas.
+
+**Solução:**
+
+```sh
+# Limpar banco de dados
+docker compose down database
+docker volume rm lab-java-quarkus_db-volume
+
+# Recriar e executar migrations
+docker compose up -d database
+cd election-management
+./mvnw clean compile  # Flyway executará as migrations
+./mvnw test
+```
+
+### DevServices não funciona
+
+**Causa:** Testcontainers 1.20.4 é incompatível com Docker API 1.44+.
+
+**Solução:** Este projeto já está configurado com DevServices desabilitados (`quarkus.devservices.enabled=false`). Use os containers manuais conforme documentado acima.
+
+### MariaDB: "Access denied for user"
+
+**Causa:** Credenciais incorretas.
+
+**Solução:**
+
+```sh
+# Verificar credenciais no docker-compose.yml:
+# MYSQL_USER=election-management-user
+# MYSQL_PASSWORD=election-management-password
+# MYSQL_DATABASE=election-management-database
+
+# Testar conexão
+docker exec -it $(docker ps -qf "name=database") \
+  mysql -uelection-management-user -pelection-management-password election-management-database
+```
+
+## Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+4. Push para a branch (`git push origin feature/MinhaFeature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto é um laboratório de estudos e está disponível para fins educacionais.
