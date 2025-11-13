@@ -340,30 +340,245 @@ quarkus.shutdown.timeout=5S
 > que possa ser facilmente restaurado em caso de falhas ou alterações.
 <br> Esse método é usado para reduzir o tempo de inatividade e minimizar os riscos de falhas durante a implantação de software, que a nova versão seja implantada e testada antes que o tráfego do usuário seja redirecionado para ela
 
-# Padrões de Arquitetura de Software
-*Arquitetura Hexagonal, Arquitetura Limpa, Arquitetura Cebola*
+## Design Patterns Utilizados
 
->A arquitetura hexagonal, a arquitetura limpa e a arquitetura cebola são 
-> todos modelos de arquitetura de software que buscam separar as 
-  responsabilidades e promover a modularidade e a manutenibilidade do código.
+Este projeto implementa diversos **Design Patterns** para garantir código limpo, testável e manutenível:
 
->A **arquitetura hexagonal** é um modelo que coloca o núcleo da aplicação no 
-> centro, cercado por portas (interfaces) que fornecem entradas e saídas para 
-  a aplicação, e adaptadores que conectam essas portas à infraestrutura externa, como bancos de dados e APIs de terceiros. Essa arquitetura promove a separação de preocupações e permite que a lógica de negócios seja testada independentemente da infraestrutura externa.
+### 1. Hexagonal Architecture (Ports & Adapters) 🎯
 
-> A **arquitetura** limpa é um modelo que coloca a lógica de negócios no centro,
-> cercada por camadas que fornecem abstrações para a infraestrutura externa. A arquitetura limpa tem como objetivo
-> isolar a lógica de negócios da infraestrutura externa e promover a testabilidade, manutenibilidade e escalabilidade do
-> código.
+**O que é:** Arquitetura que coloca a lógica de negócio no centro, isolada da infraestrutura externa através de portas (interfaces) e adaptadores (implementações).
 
-> A **arquitetura cebola** é um modelo que coloca a lógica de negócios no centro,
-> cercada por camadas que fornecem abstrações para as camadas externas. A arquitetura cebola tem como objetivo garantir
-> que as camadas mais internas sejam independentes das camadas externas, permitindo que a lógica de negócios seja testada
-> de forma isolada. A arquitetura cebola é semelhante à arquitetura limpa, mas é mais focada na independência das camadas
-> internas.
+**Estrutura do projeto:**
 
-fonte:
-https://www.thoughtworks.com/insights/blog/architecture/demystify-software-architecture-patterns
+```
+├── domain/           → Core da aplicação (regras de negócio)
+│   ├── Candidate.java
+│   ├── CandidateRepository.java (Porta)
+│   └── CandidateService.java
+├── api/              → Portas de entrada (DTOs, conversores)
+│   ├── CandidateApi.java
+│   └── dto/
+└── infrastructure/   → Adaptadores (REST, Database, Cache)
+    ├── repositories/
+    │   └── SQLCandidateRepository.java (Adaptador)
+    └── resources/
+        └── CandidateResource.java
+```
+
+**Por que usar:**
+- ✅ **Testabilidade:** Lógica de negócio pode ser testada sem banco de dados ou APIs externas
+- ✅ **Flexibilidade:** Trocar de SQL para NoSQL sem alterar o domínio
+- ✅ **Independência:** Core da aplicação não depende de frameworks
+- ✅ **Manutenibilidade:** Mudanças na infraestrutura não afetam regras de negócio
+
+### 2. Repository Pattern 📦
+
+**O que é:** Abstração que encapsula a lógica de acesso a dados.
+
+**Implementação:**
+
+```java
+// Interface no domínio (Porta)
+public interface CandidateRepository {
+  void save(List<Candidate> candidates);
+  List<Candidate> find(CandidateQuery query);
+}
+
+// Implementação SQL (Adaptador)
+@ApplicationScoped
+public class SQLCandidateRepository implements CandidateRepository {
+  // Implementação com JPA/Hibernate
+}
+```
+
+**Por que usar:**
+- ✅ **Desacoplamento:** Domínio não conhece detalhes do banco de dados
+- ✅ **Substituição:** Fácil trocar implementação (SQL, NoSQL, In-Memory para testes)
+- ✅ **Centralização:** Queries complexas ficam isoladas no repositório
+
+### 3. Builder Pattern 🏗️
+
+**O que é:** Facilita a construção de objetos complexos com múltiplos parâmetros opcionais.
+
+**Implementação com FreeBuilder:**
+
+```java
+@FreeBuilder
+public interface CandidateQuery {
+  Optional<Set<String>> ids();
+  Optional<String> name();
+  
+  class Builder extends CandidateQuery_Builder {}
+}
+
+// Uso fluente e legível
+var query = new CandidateQuery.Builder()
+  .ids(Set.of("123", "456"))
+  .name("Silva")
+  .build();
+```
+
+**Por que usar:**
+- ✅ **Legibilidade:** Código mais expressivo e auto-documentado
+- ✅ **Imutabilidade:** Objetos seguros para uso concorrente
+- ✅ **Flexibilidade:** Parâmetros opcionais sem construtores sobrecarregados
+
+### 4. Facade Pattern 🎭
+
+**O que é:** Fornece interface simplificada para operações complexas.
+
+**Implementação:**
+
+```java
+@ApplicationScoped
+public class CandidateApi { // Fachada
+  private final CandidateService service;
+  
+  public void create(CreateCandidate dto) {
+    service.save(dto.toDomain()); // Simplifica conversão DTO → Domain
+  }
+}
+```
+
+**Por que usar:**
+- ✅ **Simplicidade:** Resources REST não precisam conhecer detalhes de conversão
+- ✅ **Reutilização:** Lógica de conversão centralizada
+- ✅ **Coesão:** Separa responsabilidades (REST vs conversão de dados)
+
+### 5. DTO Pattern (Data Transfer Object) 📬
+
+**O que é:** Objetos especializados para transferência de dados entre camadas.
+
+**Estrutura:**
+
+```
+api/dto/in/   → CreateCandidate, UpdateCandidate (entrada)
+api/dto/out/  → Candidate (saída)
+domain/       → Candidate (entidade de domínio)
+```
+
+**Por que usar:**
+- ✅ **Segurança:** Expõe apenas dados necessários na API
+- ✅ **Versionamento:** Mudar API sem afetar domínio
+- ✅ **Validação:** Validações específicas de entrada/saída
+
+### 6. Dependency Injection (CDI) 💉
+
+**O que é:** Container gerencia criação e injeção de dependências.
+
+**Implementação:**
+
+```java
+@ApplicationScoped
+public class CandidateService {
+  @Inject
+  public CandidateService(CandidateRepository repository) {
+    this.repository = repository;
+  }
+}
+```
+
+**Por que usar:**
+- ✅ **Desacoplamento:** Classes não criam suas dependências
+- ✅ **Testabilidade:** Fácil criar mocks e stubs
+- ✅ **Gerenciamento:** Container controla ciclo de vida
+
+### 7. Strategy Pattern 🎲
+
+**O que é:** Define família de algoritmos intercambiáveis.
+
+**Implementação:**
+
+```java
+// Diferentes estratégias de persistência
+SQLCandidateRepository    → Estratégia SQL/JPA
+RedisElectionRepository   → Estratégia Redis/Cache
+```
+
+**Por que usar:**
+- ✅ **Polimorfismo:** Trocar implementação em runtime
+- ✅ **Extensibilidade:** Adicionar novas estratégias sem modificar código existente
+
+### 8. Observer Pattern (Pub/Sub) 👁️
+
+**O que é:** Notifica múltiplos objetos sobre mudanças de estado.
+
+**Implementação no voting-app:**
+
+```java
+@ApplicationScoped
+public class Subscribe { // Observer
+  // Escuta eventos de votação via Redis Pub/Sub
+  // Atualiza cache quando novos votos são registrados
+}
+```
+
+**Por que usar:**
+- ✅ **Desacoplamento:** Produtor e consumidor não se conhecem
+- ✅ **Escalabilidade:** Múltiplos observers podem reagir ao mesmo evento
+- ✅ **Real-time:** Atualizações instantâneas de resultados
+
+### 9. Factory Method 🏭
+
+**O que é:** Encapsula criação de objetos complexos.
+
+**Implementação:**
+
+```java
+public record Candidate(...) {
+  public static Candidate create(...) { // Factory Method
+    return new Candidate(UUID.randomUUID().toString(), ...);
+  }
+}
+```
+
+**Por que usar:**
+- ✅ **Encapsulamento:** Lógica de criação centralizada
+- ✅ **Consistência:** Garantia de objetos válidos (ex: UUID sempre gerado)
+
+### 10. Specification Pattern 🔍
+
+**O que é:** Encapsula regras de negócio em objetos reutilizáveis.
+
+**Implementação:**
+
+```java
+private Predicate[] conditions(CandidateQuery query, ...) {
+  return Stream.of(
+    query.ids().map(id -> cb.in(root.get("id")).value(id)),
+    query.name().map(name -> cb.like(...))
+  ).flatMap(Optional::stream).toArray(Predicate[]::new);
+}
+```
+
+**Por que usar:**
+- ✅ **Composição:** Combinar múltiplos critérios dinamicamente
+- ✅ **Reutilização:** Specifications podem ser compartilhadas
+- ✅ **Manutenibilidade:** Queries complexas isoladas e testáveis
+
+---
+
+### Benefícios Gerais da Arquitetura
+
+**Testabilidade:**
+- Testes unitários do domínio sem infraestrutura
+- Mocks fáceis através de interfaces (Repository, Services)
+- Testes de integração isolados por camada
+
+**Manutenibilidade:**
+- Mudanças na infraestrutura não afetam domínio
+- Código organizado por responsabilidades
+- Fácil localizar e corrigir bugs
+
+**Escalabilidade:**
+- Fácil adicionar novos adaptadores (GraphQL, gRPC)
+- Substituir tecnologias sem reescrever lógica de negócio
+- Microserviços independentes (election-management, voting-app, result-app)
+
+**Referências:**
+- [Hexagonal Architecture - Alistair Cockburn](https://alistair.cockburn.us/hexagonal-architecture/)
+- [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Thoughtworks - Software Architecture Patterns](https://www.thoughtworks.com/insights/blog/architecture/demystify-software-architecture-patterns)
 
 
 ## Create || Remove folders structures
