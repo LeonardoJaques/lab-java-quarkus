@@ -80,18 +80,35 @@ D --> E
 * OpenTelemetry
 * RESTEasy Reactive
 * SmallRye Context Propagation
+* **SmallRye Fault Tolerance** - Circuit Breaker, Retry, Timeout, Fallback ✨
 * SmallRye Health
+* **Micrometer + Prometheus** - Métricas customizadas ✨
 * Vert.x (para programação reativa)
 * Mokito (para testes)
 * Instancio (para injeção de dependência)
 
+**Bibliotecas de Performance e Resiliência:**
+
+* **Bucket4j 8.7.0** - Rate Limiting (Token Bucket) ✨
+* **Virtual Threads (Java 21)** - Project Loom ⚡
+
 
 ## Pré-requisitos
 
-- Java 17 (JDK)
-- Maven 3.8+
-- Docker e Docker Compose
-- Git
+### Obrigatórios
+
+- **Java 21** (JDK 21.0.5 ou superior) - Necessário para Virtual Threads ⚡
+  - Recomendado: Instalar via [SDKMAN](https://sdkman.io/)
+  - Comando: `sdk install java 21.0.5-tem`
+- **Maven** (incluído via wrapper `./mvnw`)
+- **Docker** e **Docker Compose**
+- **Git**
+
+### Opcionais (para desenvolvimento)
+
+- **IntelliJ IDEA** ou VS Code
+- **curl** ou **httpie** (para testes de API)
+- **jq** (para formatar JSON no terminal)
 
 ## Configuração do Ambiente
 
@@ -111,11 +128,23 @@ docker ps | grep -E "database|caching"
 
 ### 2. Configuração das Portas
 
-O `docker-compose.yml` já está configurado para expor as portas:
+O sistema utiliza as seguintes portas:
+
+**Infraestrutura:**
 - MariaDB: `localhost:3306`
 - Redis: `localhost:6379`
 
-### 3. Variáveis de Ambiente (Opcional)
+**Microserviços:**
+- `election-management`: `localhost:8080`
+- `voting-app`: `localhost:8081`
+- `result-app`: `localhost:8082`
+
+**Monitoramento (disponível em todos os serviços):**
+- Health checks: `http://localhost:808X/q/health`
+- Métricas Prometheus: `http://localhost:808X/q/metrics`
+- Health ready: `http://localhost:808X/q/health/ready`
+
+### 3. Variáveis de Ambiente e Configuração
 
 O projeto utiliza as seguintes variáveis no `application.properties`:
 
@@ -125,12 +154,22 @@ quarkus.datasource.jdbc.url=jdbc:mariadb://localhost:3306/election-management-da
 quarkus.datasource.username=election-management-user
 quarkus.datasource.password=election-management-password
 
-# Redis
+# Redis (OBRIGATÓRIO - adicionado para Virtual Threads)
 quarkus.redis.hosts=redis://localhost:6379
+quarkus.redis.timeout=5s
+
+# Virtual Threads (Java 21+)
+quarkus.virtual-threads.enabled=true
+
+# Metrics & Monitoring
+quarkus.micrometer.enabled=true
+quarkus.micrometer.export.prometheus.enabled=true
 
 # OpenTelemetry
 quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317
 ```
+
+**⚠️ Importante:** A configuração `quarkus.redis.hosts` é obrigatória no `voting-app/src/main/resources/application.properties`. Caso não esteja presente, adicione-a manualmente.
 
 Para sobrescrever em diferentes ambientes:
 
@@ -279,9 +318,28 @@ cd election-management
 **3. Executar Testes Automatizados (em outro terminal)**
 
 ```sh
-# Script completo de testes
+# Script completo de testes da API
 ./test-api-curl.sh
 ```
+
+**OU executar testes de performance (Java 21 + Virtual Threads):**
+
+```sh
+# Teste básico de performance com curl
+./performance-test-curl.sh
+
+# Teste de stress (1000+ requisições simultâneas)
+./stress-test-virtual-threads.sh
+
+# Teste específico de Virtual Threads
+./test-virtual-threads.sh
+```
+
+**Scripts disponíveis:**
+- `test-api-curl.sh` - Testa endpoints da API (CRUD)
+- `performance-test-curl.sh` - Mede throughput e latência
+- `stress-test-virtual-threads.sh` - Stress test com carga pesada
+- `test-virtual-threads.sh` - Valida Virtual Threads com Java 21
 
 **OU executar testes manuais individuais** (veja seção abaixo)
 
