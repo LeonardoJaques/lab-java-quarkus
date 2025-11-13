@@ -122,44 +122,6 @@ cd election-management
 
 Todos os 12 testes devem passar com sucesso.
 
-## Correções Implementadas
-
-### Problemas Corrigidos
-
-1. **ElectionCandidate.fromDomain()** - Corrigido retorno de `Object` para `ElectionCandidate` (type safety)
-2. **ResultResources** - Removido cast perigoso para `Flow.Publisher`, usando transformação reativa correta
-3. **ElectionRepository** - Adicionado método `sync()` na interface
-4. **RedisElectionRepository** - Implementado exception handling, logging (JBoss) e método `sync()`
-5. **SQLElectionRepository** - Implementado exception handling, logging e corrigido retorno do `sync()`
-6. **VotingResource** - Adicionada validação manual de entrada com `BadRequestException`
-7. **application.properties** - Corrigido OpenTelemetry config (`jdbc.telemetry` ao invés de `driver`), adicionado logging fallback
-8. **Imports** - Corrigido `javax.inject` → `jakarta.inject` (Jakarta EE 9+)
-9. **Testes** - Adicionado `@BeforeEach` para limpar banco antes de cada teste, evitando acúmulo de dados
-
-### Configurações Importantes
-
-**DevServices Desabilitado:**
-
-Devido à incompatibilidade entre Testcontainers 1.20.4 e Docker API 1.44+, os DevServices do Quarkus foram desabilitados em `application.properties`:
-
-```properties
-%dev.quarkus.devservices.enabled=false
-%test.quarkus.devservices.enabled=false
-%dev.quarkus.datasource.devservices.enabled=false
-%test.quarkus.datasource.devservices.enabled=false
-%dev.quarkus.redis.devservices.enabled=false
-%test.quarkus.redis.devservices.enabled=false
-```
-
-**Configuração Manual (Testes):**
-
-```properties
-%test.quarkus.datasource.username=election-management-user
-%test.quarkus.datasource.password=election-management-password
-%test.quarkus.datasource.jdbc.url=jdbc:mariadb://localhost:3306/election-management
-%test.quarkus.redis.hosts=redis://localhost:6379
-```
-
 ## Docker Compose - Comandos Completos
 
 ```sh
