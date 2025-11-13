@@ -1,0 +1,194 @@
+{
+  "info": {
+    "name": "Quarkus Voting System API",
+    "description": "Collection de testes para o sistema de votação com Quarkus",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Election Management",
+      "item": [
+        {
+          "name": "List All Candidates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/candidates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "candidates"]
+            }
+          }
+        },
+        {
+          "name": "Create Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"givenName\": \"Leonardo\",\n  \"familyName\": \"Jaques\",\n  \"email\": \"leonardo@example.com\",\n  \"phone\": \"+55 11 98765-4321\",\n  \"jobTitle\": \"Software Engineer\",\n  \"photo\": \"https://example.com/photo.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/candidates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "candidates"]
+            }
+          }
+        },
+        {
+          "name": "Update Candidate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"givenName\": \"Leonardo\",\n  \"familyName\": \"Jaques Updated\",\n  \"email\": \"leonardo.updated@example.com\",\n  \"phone\": \"+55 11 91111-1111\",\n  \"jobTitle\": \"Senior Software Engineer\",\n  \"photo\": \"https://example.com/photo-new.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/candidates/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "candidates", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{candidateId}}",
+                  "description": "ID do candidato"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Election",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/elections",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "elections"]
+            }
+          }
+        },
+        {
+          "name": "List All Elections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/elections",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "elections"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Voting App (Port 8081)",
+      "item": [
+        {
+          "name": "List Available Elections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8081/api/voting",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "voting"]
+            }
+          }
+        },
+        {
+          "name": "Vote",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8081/api/voting/elections/:electionId/candidates/:candidateId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "voting", "elections", ":electionId", "candidates", ":candidateId"],
+              "variable": [
+                {
+                  "key": "electionId",
+                  "value": "{{electionId}}",
+                  "description": "ID da eleição"
+                },
+                {
+                  "key": "candidateId",
+                  "value": "{{candidateId}}",
+                  "description": "ID do candidato"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Result App (Port 8082)",
+      "item": [
+        {
+          "name": "Stream Results (SSE)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8082/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": [""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

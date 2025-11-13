@@ -244,6 +244,260 @@ curl -X POST http://localhost:8080/api/voting/elections/{election-id}/candidates
 curl http://localhost:8080/
 ```
 
+## Testes Automatizados com Curl
+
+### Passo a Passo para Testar a API
+
+**Pré-requisitos:**
+- Containers Docker rodando (MariaDB e Redis)
+- Aplicação iniciada em modo dev
+
+**1. Iniciar Infraestrutura (Docker)**
+
+```sh
+# Iniciar containers de banco de dados e cache
+docker compose up -d database caching
+
+# Verificar se estão rodando
+docker ps | grep -E "database|caching"
+```
+
+**2. Iniciar Aplicação (em um terminal separado)**
+
+```sh
+# Entrar no diretório do módulo
+cd election-management
+
+# Iniciar em modo desenvolvimento
+./mvnw quarkus:dev
+
+# Aguardar mensagem: "Listening on: http://localhost:8080"
+```
+
+**3. Executar Testes Automatizados (em outro terminal)**
+
+```sh
+# Script completo de testes
+./test-api-curl.sh
+```
+
+**OU executar testes manuais individuais** (veja seção abaixo)
+
+### Testando com Postman ou Insomnia
+
+Se preferir usar ferramentas gráficas como Postman ou Insomnia:
+
+**Importar Collection Postman:**
+
+1. Abra o Postman
+2. Clique em **Import**
+3. Selecione o arquivo `postman-collection.json` (na raiz do projeto)
+4. A collection "Quarkus Voting System API" será importada com todos os endpoints
+
+**OU criar manualmente:**
+
+1. Crie uma nova Collection
+2. Configure Base URL: `http://localhost:8080`
+3. Adicione os endpoints listados na seção "Testes Manuais Individuais"
+
+**Variáveis de Ambiente (Postman):**
+
+- `baseUrl`: `http://localhost:8080`
+- `candidateId`: (copiar do response após criar candidato)
+- `electionId`: (copiar do response após criar eleição)
+
+### Testes Incluídos no Script
+
+O script `test-api-curl.sh` executa automaticamente:
+
+1. ✅ **GET /api/candidates** - Lista todos os candidatos
+2. ✅ **POST /api/candidates** - Cria novos candidatos (2 exemplos)
+3. ✅ **PUT /api/candidates/{id}** - Atualiza candidato existente
+4. ✅ **POST /api/elections** - Cria nova eleição
+5. ✅ **GET /api/elections** - Lista todas as eleições
+
+### Testes Manuais Individuais
+
+**1. Listar Candidatos:**
+
+```sh
+curl -X GET http://localhost:8080/api/candidates \
+  -H "Accept: application/json"
+```
+
+**2. Criar Candidato:**
+
+```sh
+curl -X POST http://localhost:8080/api/candidates \
+  -H "Content-Type: application/json" \
+  -d '{
+    "givenName": "Leonardo",
+    "familyName": "Jaques",
+    "email": "leonardo@example.com",
+    "phone": "+55 11 98765-4321",
+    "jobTitle": "Software Engineer"
+  }'
+```
+
+**3. Atualizar Candidato:**
+
+```sh
+curl -X PUT http://localhost:8080/api/candidates/{candidate-id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "givenName": "Leonardo",
+    "familyName": "Jaques Updated",
+    "email": "leonardo.updated@example.com",
+    "phone": "+55 11 91111-1111",
+    "jobTitle": "Senior Software Engineer"
+  }'
+```
+
+**4. Criar Eleição:**
+
+```sh
+curl -X POST http://localhost:8080/api/elections
+```
+
+**5. Listar Eleições:**
+
+```sh
+curl -X GET http://localhost:8080/api/elections \
+  -H "Accept: application/json"
+```
+
+**6. Votar (Voting App - porta 8081):**
+
+```sh
+# Primeiro, listar eleições disponíveis
+curl -X GET http://localhost:8081/api/voting
+
+# Registrar voto
+curl -X POST http://localhost:8081/api/voting/elections/{election-id}/candidates/{candidate-id}
+```
+
+**7. Ver Resultados em Tempo Real (Result App - porta 8082):**
+
+```sh
+# Stream de resultados (Server-Sent Events)
+curl http://localhost:8082/
+```
+
+### Exemplo de Resposta
+
+**GET /api/candidates:**
+
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "givenName": "Leonardo",
+    "familyName": "Jaques",
+    "email": "leonardo@example.com",
+    "phone": "+55 11 98765-4321",
+    "jobTitle": "Software Engineer",
+    "photo": "https://example.com/photo.jpg"
+  }
+]
+```
+
+**POST /api/elections:**
+
+```json
+{
+  "id": "650e8400-e29b-41d4-a716-446655440001",
+  "candidates": []
+}
+```
+
+### Exemplo Completo: Fluxo de Teste Passo a Passo
+
+```sh
+# 1. Verificar que não há candidatos
+curl -X GET http://localhost:8080/api/candidates
+# Resposta: []
+
+# 2. Criar primeiro candidato
+curl -X POST http://localhost:8080/api/candidates \
+  -H "Content-Type: application/json" \
+  -d '{
+    "givenName": "Leonardo",
+    "familyName": "Jaques",
+    "email": "leonardo@example.com",
+    "phone": "+55 11 98765-4321",
+    "jobTitle": "Software Engineer"
+  }'
+# Resposta: Status 201 Created
+
+# 3. Criar segundo candidato
+curl -X POST http://localhost:8080/api/candidates \
+  -H "Content-Type: application/json" \
+  -d '{
+    "givenName": "Maria",
+    "familyName": "Silva",
+    "email": "maria@example.com",
+    "phone": "+55 21 99999-8888",
+    "jobTitle": "Product Manager"
+  }'
+
+# 4. Listar candidatos criados
+curl -X GET http://localhost:8080/api/candidates
+# Resposta: Array com 2 candidatos
+
+# 5. Copiar ID do primeiro candidato da resposta anterior (ex: abc123)
+
+# 6. Atualizar candidato
+curl -X PUT http://localhost:8080/api/candidates/abc123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "givenName": "Leonardo",
+    "familyName": "Jaques Updated",
+    "email": "leonardo.updated@example.com",
+    "phone": "+55 11 91111-1111",
+    "jobTitle": "Senior Software Engineer"
+  }'
+
+# 7. Criar eleição
+curl -X POST http://localhost:8080/api/elections
+
+# 8. Listar eleições
+curl -X GET http://localhost:8080/api/elections
+```
+
+### Dicas de Teste
+
+**Com JQ (formatação JSON):**
+
+```sh
+# Instalar jq (se não tiver)
+sudo apt-get install jq  # Ubuntu/Debian
+brew install jq          # macOS
+
+# Usar com curl
+curl -s http://localhost:8080/api/candidates | jq '.'
+
+# Extrair apenas nomes
+curl -s http://localhost:8080/api/candidates | jq '.[].givenName'
+
+# Extrair primeiro ID
+curl -s http://localhost:8080/api/candidates | jq -r '.[0].id'
+```
+
+**Testar com Verbose (ver headers):**
+
+```sh
+curl -v -X POST http://localhost:8080/api/candidates \
+  -H "Content-Type: application/json" \
+  -d '{"givenName":"Test","familyName":"User","email":"test@example.com"}'
+```
+
+**Salvar resposta em arquivo:**
+
+```sh
+curl -X GET http://localhost:8080/api/candidates > candidates.json
+cat candidates.json | jq '.'
+```
+
 ## Docker Compose - Comandos Completos
 
 ```sh
