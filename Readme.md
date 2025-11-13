@@ -118,7 +118,7 @@ Os containers MariaDB e Redis devem estar rodando com as portas expostas:
 
 ```sh
 # Iniciar banco de dados e cache
-docker compose up -d database caching
+docker compose -f config/docker-compose.yml up -d database caching
 
 # Verificar se os containers estão rodando
 docker ps | grep -E "database|caching"
@@ -297,7 +297,7 @@ curl http://localhost:8080/
 
 ```sh
 # Iniciar containers de banco de dados e cache
-docker compose up -d database caching
+docker compose -f config/docker-compose.yml up -d database caching
 
 # Verificar se estão rodando
 docker ps | grep -E "database|caching"
@@ -319,27 +319,27 @@ cd election-management
 
 ```sh
 # Script completo de testes da API
-./test-api-curl.sh
+./scripts/test-api-curl.sh
 ```
 
 **OU executar testes de performance (Java 21 + Virtual Threads):**
 
 ```sh
 # Teste básico de performance com curl
-./performance-test-curl.sh
+./scripts/performance-test-curl.sh
 
 # Teste de stress (1000+ requisições simultâneas)
-./stress-test-virtual-threads.sh
+./scripts/stress-test-virtual-threads.sh
 
 # Teste específico de Virtual Threads
-./test-virtual-threads.sh
+./scripts/test-virtual-threads.sh
 ```
 
 **Scripts disponíveis:**
-- `test-api-curl.sh` - Testa endpoints da API (CRUD)
-- `performance-test-curl.sh` - Mede throughput e latência
-- `stress-test-virtual-threads.sh` - Stress test com carga pesada
-- `test-virtual-threads.sh` - Valida Virtual Threads com Java 21
+- `scripts/test-api-curl.sh` - Testa endpoints da API (CRUD)
+- `scripts/performance-test-curl.sh` - Mede throughput e latência
+- `scripts/stress-test-virtual-threads.sh` - Stress test com carga pesada
+- `scripts/test-virtual-threads.sh` - Valida Virtual Threads com Java 21
 
 **OU executar testes manuais individuais** (veja seção abaixo)
 
@@ -351,7 +351,7 @@ Se preferir usar ferramentas gráficas como Postman ou Insomnia:
 
 1. Abra o Postman
 2. Clique em **Import**
-3. Selecione o arquivo `postman-collection.json` (na raiz do projeto)
+3. Selecione o arquivo `config/postman-collection.json`
 4. A collection "Quarkus Voting System API" será importada com todos os endpoints
 
 **OU criar manualmente:**
@@ -368,7 +368,7 @@ Se preferir usar ferramentas gráficas como Postman ou Insomnia:
 
 ### Testes Incluídos no Script
 
-O script `test-api-curl.sh` executa automaticamente:
+O script `scripts/test-api-curl.sh` executa automaticamente:
 
 1. ✅ **GET /api/candidates** - Lista todos os candidatos
 2. ✅ **POST /api/candidates** - Cria novos candidatos (2 exemplos)
@@ -562,13 +562,13 @@ cat candidates.json | jq '.'
 
 ```sh
 # Iniciar todos os serviços de infraestrutura
-docker compose up -d reverse-proxy jaeger mongodb opensearch graylog caching database
+docker compose -f config/docker-compose.yml up -d reverse-proxy jaeger mongodb opensearch graylog caching database
 
 # Ou iniciar serviços individuais
-docker compose up -d database caching  # MariaDB e Redis para desenvolvimento/testes
-docker compose up -d reverse-proxy     # Traefik
-docker compose up -d jaeger           # OpenTelemetry/Tracing
-docker compose up -d mongodb opensearch graylog  # Logging stack
+docker compose -f config/docker-compose.yml up -d database caching  # MariaDB e Redis para desenvolvimento/testes
+docker compose -f config/docker-compose.yml up -d reverse-proxy     # Traefik
+docker compose -f config/docker-compose.yml up -d jaeger           # OpenTelemetry/Tracing
+docker compose -f config/docker-compose.yml up -d mongodb opensearch graylog  # Logging stack
 
 # Criar input GELF no Graylog (após graylog estar rodando)
 curl -H "Content-Type: application/json" \
@@ -579,7 +579,7 @@ curl -H "Content-Type: application/json" \
   http://logging.private.jaques.localhost/api/system/inputs
 
 # Parar todos os serviços
-docker compose down
+docker compose -f config/docker-compose.yml down
 ```
 
 ## Quarkus - Comandos para Criar Projetos

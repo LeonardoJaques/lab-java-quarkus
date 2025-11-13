@@ -31,7 +31,7 @@ echo ""
 # Iniciar Docker
 echo -e "${YELLOW}[1/5] Starting Docker containers...${NC}"
 cd /home/leonardojaques/Projetos/lab-java-quarkus
-docker compose up -d database caching
+docker compose -f config/docker-compose.yml up -d database caching
 sleep 3
 echo -e "${GREEN}✓ Docker containers started${NC}"
 echo ""

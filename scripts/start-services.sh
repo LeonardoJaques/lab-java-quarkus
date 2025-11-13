@@ -17,7 +17,7 @@ sleep 2
 # Start Docker containers
 echo "Starting Docker containers..."
 cd /home/leonardojaques/Projetos/lab-java-quarkus
-docker compose up -d database caching
+docker compose -f config/docker-compose.yml up -d database caching
 sleep 5
 
 # Build all projects if needed

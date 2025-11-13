@@ -14,7 +14,7 @@ if [[ $BLUE_CONTAINERS_SCALE == 0 ]]; then
     GREEN_CONTAINERS_SCALE=1
 fi
 
-TAG=$GREEN_CONTAINER_DEPLOY_TAG docker compose up -d "$APP" --scale "$APP=$GREEN_CONTAINERS_SCALE" --no-recreate --no-build
+TAG=$GREEN_CONTAINER_DEPLOY_TAG docker compose -f config/docker-compose.yml up -d "$APP" --scale "$APP=$GREEN_CONTAINERS_SCALE" --no-recreate --no-build
 
 until [ "$(docker ps -q -f "name=${APP}" -f "health=healthy" | wc -l | xargs)" == $GREEN_CONTAINERS_SCALE ]; do
     sleep 0.1;

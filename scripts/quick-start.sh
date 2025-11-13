@@ -16,7 +16,7 @@ sleep 2
 # Start Docker
 echo "Starting Docker containers..."
 cd /home/leonardojaques/Projetos/lab-java-quarkus
-docker compose up -d database caching 2>/dev/null
+docker compose -f config/docker-compose.yml up -d database caching 2>/dev/null
 sleep 3
 
 # Function to start a service
