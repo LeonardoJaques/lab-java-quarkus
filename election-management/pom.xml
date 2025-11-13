@@ -89,6 +89,11 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-redis-client</artifactId>
     </dependency>
+    <!-- SmallRye Fault Tolerance for Circuit Breaker, Retry, Timeout -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
+    </dependency>
       <dependency>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-scheduler</artifactId>
