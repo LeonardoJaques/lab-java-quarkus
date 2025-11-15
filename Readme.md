@@ -6,7 +6,16 @@ Projeto de sistema de votação eletrônica desenvolvido com Quarkus, implementa
 
 ✅ **Compilação:** Todos os módulos compilam com sucesso  
 ✅ **Testes:** 12/12 testes passando (0 falhas, 0 erros)  
-✅ **Configuração:** DevServices desabilitado, containers manuais configurados
+✅ **Configuração:** DevServices desabilitado, containers manuais configurados  
+✅ **Swagger/OpenAPI:** Instalado e configurado em todos os módulos ✨
+
+## Documentação Adicional
+
+- 📖 [Configuração do Swagger/OpenAPI](docs/SWAGGER-SETUP.md)
+- 📋 [Resumo da Instalação do Swagger](docs/SWAGGER-INSTALLATION-SUMMARY.md)
+- 📊 [Relatório de Performance](docs/PERFORMANCE-REPORT.txt)
+- 🔄 [Resumo do Upgrade Java 21](docs/JAVA21-UPGRADE-SUMMARY.md)
+- 📁 [Organização de Arquivos](docs/FILE-ORGANIZATION-SUMMARY.md)
 
 ## Definição do Escopo
 - Candidatos são listados, cadastrados e editados
@@ -82,6 +91,7 @@ D --> E
 * SmallRye Context Propagation
 * **SmallRye Fault Tolerance** - Circuit Breaker, Retry, Timeout, Fallback ✨
 * SmallRye Health
+* **SmallRye OpenAPI/Swagger** - Documentação automática de APIs ✨
 * **Micrometer + Prometheus** - Métricas customizadas ✨
 * Vert.x (para programação reativa)
 * Mokito (para testes)
@@ -143,6 +153,54 @@ O sistema utiliza as seguintes portas:
 - Health checks: `http://localhost:808X/q/health`
 - Métricas Prometheus: `http://localhost:808X/q/metrics`
 - Health ready: `http://localhost:808X/q/health/ready`
+- **Swagger UI: `http://localhost:808X/q/swagger-ui`** ✨
+- **OpenAPI Spec: `http://localhost:808X/q/openapi`** ✨
+
+### Documentação das APIs (Swagger/OpenAPI)
+
+Todos os três microserviços possuem documentação automática das APIs via Swagger UI:
+
+- **Election Management API:** http://localhost:8080/q/swagger-ui
+  - Gerenciamento de candidatos e eleições
+  - Endpoints de administração
+
+- **Voting App API:** http://localhost:8081/q/swagger-ui
+  - Sistema de votação com Virtual Threads
+  - Rate limiting e circuit breaker
+
+- **Result App API:** http://localhost:8082/q/swagger-ui
+  - Consulta de resultados em tempo real
+
+**Configuração:**
+
+Cada aplicação está configurada com as seguintes propriedades:
+
+```properties
+# Swagger/OpenAPI
+quarkus.swagger-ui.always-include=true
+quarkus.swagger-ui.path=/q/swagger-ui
+mp.openapi.extensions.smallrye.info.title=<Nome da API>
+mp.openapi.extensions.smallrye.info.version=1.0.0
+mp.openapi.extensions.smallrye.info.description=<Descrição da API>
+```
+
+**Testando o Swagger:**
+
+1. Inicie os serviços necessários (MariaDB e Redis):
+```bash
+docker compose -f config/docker-compose.yml up -d database caching
+```
+
+2. Inicie a aplicação em modo dev:
+```bash
+cd election-management  # ou voting-app / result-app
+./mvnw quarkus:dev
+```
+
+3. Acesse o Swagger UI no navegador:
+   - http://localhost:8080/q/swagger-ui (election-management)
+   - http://localhost:8081/q/swagger-ui (voting-app)
+   - http://localhost:8082/q/swagger-ui (result-app)
 
 ### 3. Variáveis de Ambiente e Configuração
 
@@ -337,6 +395,7 @@ cd election-management
 
 **Scripts disponíveis:**
 - `scripts/test-api-curl.sh` - Testa endpoints da API (CRUD)
+- `scripts/test-swagger.sh` - Testa disponibilidade do Swagger UI ✨
 - `scripts/performance-test-curl.sh` - Mede throughput e latência
 - `scripts/stress-test-virtual-threads.sh` - Stress test com carga pesada
 - `scripts/test-virtual-threads.sh` - Valida Virtual Threads com Java 21
